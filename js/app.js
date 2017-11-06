@@ -1,10 +1,15 @@
-var markersArray = [
-
-]
+var markerArray = [];
+var filterArray = ['Restaurants', 'Schools', 'University', 'Bus', 'Museum', 'Park'];
+var currentMarker;
 
 var ViewModel = function() {
     var self = this;
-    var geocoder;
+    var geocoder = new google.maps.Geocoder();
+
+    self.markerArray = ko.observableArray(markerArray);
+    self.bounds = new google.maps.LatLngBounds();
+    self.searchText = ko.observable('');
+
     var location = {
         lat: 40.585258,
         lng: -105.084419
@@ -12,15 +17,16 @@ var ViewModel = function() {
 
     var map = new google.maps.Map(document.getElementById('map'), {
         center: location,
-        zoom: 13,
+        zoom: 15,
         mapTypeControl: false,
         mapType: 'normal'
     });
 
+
     var request = {
         location: location,
         radius: '2000',
-        types: ['shopping_mall', 'art_gallery', 'restaurant', 'park', 'university']
+        types: ['school', 'museum', 'restaurant', 'park', 'university', 'bus_station']
     };
 
     var service = new google.maps.places.PlacesService(map);
@@ -28,35 +34,66 @@ var ViewModel = function() {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
             for (var i = 0; i < results.length; i++) {
                 var place = results[i];
-                // If the request succeeds, draw the place location on
-                // the map as a marker, and register an event to handle a
-                // click on the marker.
                 var marker = new google.maps.Marker({
                     map: map,
-                    position: place.geometry.location
+                    position: place.geometry.location,
+                    title: place.name
                 });
+
+                self.markerArray.push(marker);
+                self.bounds.extend(marker.position);
             }
+            map.fitBounds(self.bounds);
+
         } else {
             //TODO: handle error
         }
     });
 
-    this.searchText = ko.observable('');
-    this.updateMarker = ko.computed(function() {
-        alert("calling updateMarker " + this.searchText);
-        //   //var address = document.getElementById('search-text').value;
-        //   geocoder.geocode({'address': searchText}, function(results, status) {
-        // if (status == 'OK') {
-        // 	map.setCenter(results[0].geometry.location);
-        // 	var marker = new google.maps.Marker({
-        // 		map: map,
-        // 		position: results[0].geometry.location
-        // 	});
-        // } else {
-        // 	alert('Geocode was not successful for the following reason: ' + status);
-        // }
-        //   });
+    self.filterArrayVisible = ko.observable(false);
+    self.toggleFilterArray = function() {
+        self.filterArrayVisible(!self.filterArrayVisible());
+    }
+
+    self.filterArray = ko.observableArray(filterArray);
+    self.currentFilter = ko.observable('Restaurants');
+
+    self.currentFilter = ko.computed(function() {
+        document.getElementById
     });
+
+    self.updateMarker = ko.computed(function() {
+        geocoder.geocode({
+            'address': self.searchText()
+        }, function(results, status) {
+            if (status == 'OK') {
+                var place = results[0];
+                clearMarkers();
+                map.setCenter(place.geometry.location);
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: place.geometry.location,
+                    title: place.name
+                });
+                self.markerArray.push(marker);
+                self.bounds.extend(marker.position);
+                map.fitBounds(self.bounds);
+                // }
+            } else {
+                console.dir('Geocode was not successful for the following reason: ' + status);
+            }
+        });
+    });
+
+    var clearMarkers = function() {
+        console.log("clearing markers");
+        for (var i = 0; i < self.markerArray.length; i++) {
+            self.markerArray[i].setMap(null);
+        }
+        self.markerArray = [];
+        console.log("markerArray.length " + markerArray.length);
+
+    }
 }
 
 ko.applyBindings(new ViewModel());
