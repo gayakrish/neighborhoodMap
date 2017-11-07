@@ -2,46 +2,46 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <title> Fort Collins NeightborHood Map </title>
-  <!-- different font families included -->
-  <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
-  <link rel="stylesheet" href="http://weloveiconfonts.com/api/?family=zocial" />
-  <!-- css styling files -->
-  <link rel="stylesheet" href="css/styles.css">
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-  <script src="js/lib/knockout-3.2.0.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title> Fort Collins NeightborHood Map </title>
+    <!-- different font families included -->
+    <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+    <link rel="stylesheet" href="http://weloveiconfonts.com/api/?family=zocial" />
+    <!-- css styling files -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <script src="js/lib/knockout-3.2.0.js"></script>
 </head>
 
 <body>
-  <div class="container-fluid">
-    <table>
-      <tr class="navbar">
-        <th colspan="3">
-          <input type="text" placeholder="Search" id="search-text" data-bind="value: searchText">
-        </th>
-        <!-- <th colspan="1">
+    <div class="container-fluid">
+        <table>
+            <tr class="navbar">
+                <th colspan="3">
+                    <input type="text" placeholder="Search" id="search-text" data-bind="value: searchText">
+                </th>
+                <!-- <th colspan="1">
           <button id="filterBtn" data-bind="value: currentFilter, click: toggleFilterArray">Filter <i class="fa fa-filter"></i></button>
           <select data-bind="options: filterArray, selectedOptions: currentFilter, visible: filterArrayVisible" size="6" multiple="false" id="filterList"></select>
         </th> -->
-        <th colspan="9"> <span> </span>
-        </th>
-      </tr>
-      <tr>
-        <td colspan="3">
-          <ul id="search-list" data-bind="foreach: markerArray">
-            <li data-bind="text: $data.title, click: $parent.setCurrentMarker, event: {mouseover: $parent.openminiInfoWindow, mouseout: $parent.closeminiInfoWindow}"> </li>
-          </ul>
-        </td>
-        <td colspan="9" class="map-container">
-          <div id="map">
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
+                <th colspan="9"> <span> </span>
+                </th>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <ul id="search-list" data-bind="foreach: markerArray">
+                        <li data-bind="text: $data.title, click: $parent.setCurrentMarker, event: {mouseover: $parent.openminiInfoWindow, mouseout: $parent.closeminiInfoWindow}"> </li>
+                    </ul>
+                </td>
+                <td colspan="9" class="map-container">
+                    <div id="map">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
 </body>
 <script src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyCKLAjXGyawg0qIORfV758s2ioXGdsJSe4"></script>
 <script src="js/app.js">
