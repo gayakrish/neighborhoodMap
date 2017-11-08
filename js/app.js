@@ -81,7 +81,7 @@ var ViewModel = function() {
         self.service.nearbySearch(self.request, function(results, status) {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
                 var tempMarker = [];
-                clearMarkers();
+                self.clearMarkers();
                 for (var i = 0; i < results.length; i++) {
                     var place = results[i];
                     console.log("place " + place.name);
@@ -127,11 +127,10 @@ var ViewModel = function() {
     };
 
     self.toggleMarker = function(marker) {
-        if (marker.getAnimation() !== null) {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function() {
             marker.setAnimation(null);
-        } else {
-            marker.setAnimation(google.maps.Animation.DROP);
-        }
+        }, 700);
     }
 
     self.detailedInfoWindow = function(marker) {
@@ -155,32 +154,35 @@ var ViewModel = function() {
     }
 
     self.getVenueId = function() {
-        var data = JSON.parse(this.response);
-        console.log(data.response.venues);
-        var venues = data.response.venues;
+        if(data && data.results && data.results[0]) {
+            var data = JSON.parse(this.response);
+            console.log(data.response.venues);
+            var venues = data.response.venues;
 
-        for (var i = 0; i < venues.length; i++) {
-            var venueName = venues[i].name;
-            var markerTitle = self.currentMarker().title;
+            for (var i = 0; i < venues.length; i++) {
+                var venueName = venues[i].name;
+                var markerTitle = self.currentMarker().title;
 
-            if (self.checkVenueName(venueName, markerTitle)) {
+                if (self.checkVenueName(venueName, markerTitle)) {
 
-                var venueId = venues[i].id;
+                    var venueId = venues[i].id;
 
-                console.log("item id : " + venueId);
-                console.log("name " + venueName);
+                    console.log("item id : " + venueId);
+                    console.log("name " + venueName);
 
+                    const venueDetailsRequest = new XMLHttpRequest();
+                    venueDetailsRequest.onload = self.venueDetails;
+                    venueDetailsRequest.onerror = function(err) {
+                        console.log("Error getting venue details " + err);
+                    }
 
-                const venueDetailsRequest = new XMLHttpRequest();
-                venueDetailsRequest.onload = self.venueDetails;
-                venueDetailsRequest.onerror = function(err) {
-                    console.log("Error getting venue details " + err);
+                    venueDetailsRequest.open('GET', `https://api.foursquare.com/v2/venues/${venueId}?client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
+                                        &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU&v=20170101`);
+                    venueDetailsRequest.send();
                 }
-
-                venueDetailsRequest.open('GET', `https://api.foursquare.com/v2/venues/${venueId}?client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
-                                    &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU&v=20170101`);
-                venueDetailsRequest.send();
             }
+        } else {
+            //TODO appropriate error message
         }
     }
 
@@ -202,25 +204,34 @@ var ViewModel = function() {
     }
 
     self.venueDetails = function() {
-        var marker = self.currentMarker();
-        console.log("venue data");
-        var data = JSON.parse(this.response);
-        console.log(data);
-        var venueUrl = self.getVenueUrl(data);
-        var venueHours = self.getVenueHours(data);
-        var venueLoc = self.getVenueLoc(data);
-        var venuePic = self.getVenuePic(data);
-        var infoStr = `<div> <p> ${marker.title} </p>
-                        <p> ${venueLoc} </p>
-                        <img src=${venuePic}>
-                        <a href=${venueUrl}> ${venueUrl} </a>
-                        <p> ${venueHours} </p>
-                        </div>`;
-        self.miniInfoWindow.setContent(infoStr);
-        self.miniInfoWindow.open(map, marker);
-        self.miniInfoWindow.addListener('closeclick', function() {
-            self.miniInfoWindow.marker = null;
-        });
+        if(data && data.results && data.results[0]) {
+            var marker = self.currentMarker();
+            console.log("venue data");
+            var data = JSON.parse(this.response);
+            console.log(data);
+            var venueUrl = self.getVenueUrl(data);
+            var venueHours = self.getVenueHours(data);
+            var venueLoc = self.getVenueLoc(data);
+            var venuePic = self.getVenuePic(data);
+            var infoStr = `<div id="content"> <h4> ${marker.title} </h4>
+                            <table id="info">
+                            <tr>
+                            <td rowspan="3" colspan="1"> <img src=${venuePic}> </td>
+                            <td> <p>${venueLoc}</p>
+                            <a href=${venueUrl}> ${venueUrl} </a>
+                            <p> ${venueHours} </p>
+                            </td>
+                            <tr>
+                            </table>
+                            </div>`;
+            self.miniInfoWindow.setContent(infoStr);
+            self.miniInfoWindow.open(map, marker);
+            self.miniInfoWindow.addListener('closeclick', function() {
+                self.miniInfoWindow.marker = null;
+            });
+        } else {
+            //TODO: handle error
+        }
     }
 
     self.getVenuePic = function(data) {
