@@ -36,7 +36,6 @@ h4 {
     font: 16px "Comic Sans MS", cursive, sans-serif;
     height: 2em;
     box-shadow: 2px 2px 2px 2px #ada9a8;
-
 }
 
 #search-list {
@@ -55,7 +54,6 @@ h4 {
     overflow: auto;
     border-radius: 5px;
     box-shadow: 2px 2px 2px 2px #ada9a8;
-
 }
 
 li {
@@ -85,11 +83,14 @@ li {
     margin: 0;
     z-index: 99;
     font: 14px "Comic Sans MS", cursive, sans-serif;
-    display: -webkit-flex; /* Safari */
-    -webkit-justify-content: space-around; /* Safari 6.1+ */
+    display: -webkit-flex;
+    /* Safari */
+
+    -webkit-justify-content: space-around;
+    /* Safari 6.1+ */
+
     display: flex;
     justify-content: center;
-
 }
 
 .info {
@@ -106,8 +107,8 @@ li {
 }
 
 th {
-	background-color: orange;
-	border-radius: 3px;
+    background-color: orange;
+    border-radius: 3px;
 }
 
 @media screen and (max-width: 500px) {
@@ -178,15 +179,15 @@ th {
     }
 
     .info {
-	    padding: 0;
-	    margin: 0;
-	    font: 12px "Comic Sans MS", cursive, sans-serif;
-	}
+        padding: 0;
+        margin: 0;
+        font: 12px "Comic Sans MS", cursive, sans-serif;
+    }
 
-	#content {
-		resize: both;
-		overflow: auto;
-		width: 16em;
-		height: 8em;
-	}
+    #content {
+        resize: both;
+        overflow: auto;
+        width: 16em;
+        height: 8em;
+    }
 }
