@@ -142,8 +142,10 @@ var ViewModel = function() {
         self.currentMarker(marker);
         console.log("currentMarker " + self.currentMarker().title);
         self.toggleMarker(self.currentMarker());
+
         // self.openminiInfoWindow(self.currentMarker());
-        self.detailedInfoWindow(marker);
+         self.detailedInfoWindow(marker); //uncomment
+        // self.venueDetails();//uncomment - should be commented out
         //TODO: zoom in map and setcenter around current marker
     };
 
@@ -169,6 +171,7 @@ var ViewModel = function() {
         var markerLng = markerPos.lng();
         console.log("marker position " + markerLat + " , " + markerLng);
         var markerName = marker.title;
+        //uncomment
         venueIdRequest.open('GET',
             `https://api.foursquare.com/v2/venues/search?ll=${markerLat},${markerLng}&name=${markerName}
                             &client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
@@ -200,6 +203,7 @@ var ViewModel = function() {
                     console.log("Error getting venue details " + err);
                 }
 
+                //uncomment
                 venueDetailsRequest.open('GET', `https://api.foursquare.com/v2/venues/${venueId}?client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
                                     &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU&v=20170101`);
                 venueDetailsRequest.send();
@@ -239,18 +243,28 @@ var ViewModel = function() {
     self.venueDetails = function() {
         var marker = self.currentMarker();
         console.log("venue data");
+        //uncomment
         var data = JSON.parse(this.response);
         console.log(data);
         var venueUrl = self.getVenueUrl(data);
         var venueHours = self.getVenueHours(data);
         var venueLoc = self.getVenueLoc(data);
         var venuePic = self.getVenuePic(data);
-        var infoStr = `<div id="content"> <h4> ${marker.title} </h4>
+
+        //uncomment
+        // var venueUrl = "http://test.com";
+        // var venueHours = "Open until 8PM";
+        // var venueLoc = "123 lemay avenue";
+        // var venuePic = "https://farm2.staticflickr.com/1126/625069434_db86b67df8.jpg"
+        //-----
+
+        var infoStr = `<div id="content">
                         <table class="info">
+                        <tr> <th colspan="2"> <h4> ${marker.title} </h4> </th></tr>
                         <tr>
-                        <td rowspan="3" colspan="1"> <img src=${venuePic}> </td>
-                        <td>${venueLoc}
-                        <a href=${venueUrl}> ${venueUrl} </a>
+                        <td rowspan="3"> <img src=${venuePic} height=50 width=50> </td>
+                        <td>${venueLoc} <br>
+                        <a href=${venueUrl}> ${venueUrl} </a> <br>
                         ${venueHours} <br>
                         <div class="source">
                         Source: <a href="https://foursquare.com/" class="source"> https://foursquare.com </a>
