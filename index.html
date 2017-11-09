@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="http://weloveiconfonts.com/api/?family=zocial" />
   <!-- css styling files -->
   <link rel="stylesheet" href="css/styles.css">
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="js/lib/knockout-3.2.0.js"></script>
 </head>
 
@@ -23,8 +23,9 @@
     </div>
     <div id="search">
       <input type="text" placeholder="Search" id="search-text" data-bind="value: searchText">
-      <ul id="search-list" data-bind="foreach: markerArray">
-        <li data-bind="text: $data.title, click: $parent.setCurrentMarker, event: {mouseover: $parent.openminiInfoWindow, mouseout: $parent.closeminiInfoWindow}"> </li>
+      <button type="button" class="hamburger-menu" data-bind="click: toggleMenu"><i class="fa fa-list" aria-hidden="true"></i> </button>
+      <ul id="search-list" data-bind="foreach: markerArray, css: { open: menuVisible }">
+        <li data-bind="text: $data.title, click: $parent.setCurrentMarker, event: {mouseover: $parent.openminiInfoWindow, mouseout: $parent.closeminiInfoWindow}" class="search-list-item"> </li>
       </ul>
     </div>
   </div>
