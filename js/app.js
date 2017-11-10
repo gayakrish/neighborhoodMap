@@ -149,9 +149,12 @@ var ViewModel = function() {
         }, 700);
     };
 
+    self.isDetailedInfo = false;
+
     //this method sends an Ajax request to foursquare and gets the venues at the specified latlng
     self.detailedInfoWindow = function(marker) {
         self.menuVisible(false);
+        self.isDetailedInfo = false;
         const venueIdRequest = new XMLHttpRequest();
         venueIdRequest.onload = self.getVenueId;
         venueIdRequest.onerror = self.ajaxError;
@@ -168,10 +171,20 @@ var ViewModel = function() {
                             &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU
                             &v=20170101`);
         venueIdRequest.send();
+
+        // fetch(`https://api.foursquare.com/v2/venues/search?ll=${markerLat},${markerLng}&name=${markerName}
+        //     &client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
+        //     &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU
+        //     &v=20170101`)
+        // .then(response => response.json())
+        // .then(self.getVenueId)
+        // .catch(e => self.ajaxError);
     };
 
+
     //from the venue data from Ajax response, we extract the exact or matching venue's venue id
-    self.getVenueId = function() {
+    self.getVenueId = function(data) {
+        console.log('data ' + data);
         var data = JSON.parse(this.response);
         var venues = data.response.venues;
 
@@ -182,6 +195,7 @@ var ViewModel = function() {
             //check if the marker title matches with any venue name
             if (self.checkVenueName(venueName, markerTitle)) {
 
+                self.isDetailedInfo = true;
                 //get the venue details using venueId
                 var venueId = venues[i].id;
                 const venueDetailsRequest = new XMLHttpRequest();
@@ -191,14 +205,20 @@ var ViewModel = function() {
                 venueDetailsRequest.open('GET', `https://api.foursquare.com/v2/venues/${venueId}?client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
                                         &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU&v=20170101`);
                 venueDetailsRequest.send();
+
+                // fetch(`https://api.foursquare.com/v2/venues/${venueId}?client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
+                //     &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU&v=20170101`)
+                // .then(response => response.json())
+                // .then(self.venueDetails)
+                // .catch(e => self.ajaxError);
             } else {
 
-                //appropriate error message is displayed when there is no information about the venue in foursquare
-                var infoStr = `<div id="content"> <p class="info"> Couldn't find information about this place. Sorry! </p>
-                                        </div>`;
-                self.miniInfoWindow.setContent(infoStr);
-                self.miniInfoWindow.open(map, self.currentMarker());
-                self.miniInfoWindow.addListener('closeclick', self.miniInfoWindowClose);
+                // //appropriate error message is displayed when there is no information about the venue in foursquare
+                // var infoStr = `<div id="content"> <p class="info"> Couldn't find information about this place. Sorry! </p>
+                //                         </div>`;
+                // self.miniInfoWindow.setContent(infoStr);
+                // self.miniInfoWindow.open(map, self.currentMarker());
+                // self.miniInfoWindow.addListener('closeclick', self.miniInfoWindowClose);
             }
         }
     };
@@ -227,29 +247,35 @@ var ViewModel = function() {
     };
 
     //after obtaining the venue is, details about the specific venue are retrieved from JSON response and displayed in the infowindow
-    self.venueDetails = function() {
+    self.venueDetails = function(data) {
         var marker = self.currentMarker();
         var data = JSON.parse(this.response);
         var venueUrl = self.getVenueUrl(data);
         var venueHours = self.getVenueHours(data);
         var venueLoc = self.getVenueLoc(data);
         var venuePic = self.getVenuePic(data);
+        var infoStr = "";
 
-        var infoStr = `<div id="content">
-                        <table class="info">
-                        <tr> <th colspan="3"> <h4> ${marker.title} </h4> </th></tr>
-                        <tr>
-                        <td rowspan="3" colspan="1"> <img src=${venuePic} height=50 width=50> </td>
-                        <td colspan="2">${venueLoc} <br>
-                        <a href=${venueUrl}> ${venueUrl} </a> <br>
-                        ${venueHours} <br>
-                        <div class="source">
-                        Source: <a href="https://foursquare.com/" class="source"> https://foursquare.com </a>
-                        </div>
-                        </td>
-                        </tr>
-                        </table>
-                        </div>`;
+        if(self.isDetailedInfo) {
+            infoStr = `<div id="content">
+                            <table class="info">
+                            <tr> <th colspan="3"> <h4> ${marker.title} </h4> </th></tr>
+                            <tr>
+                            <td rowspan="3" colspan="1"> <img src=${venuePic} height=50 width=50> </td>
+                            <td colspan="2">${venueLoc} <br>
+                            <a href=${venueUrl}> ${venueUrl} </a> <br>
+                            ${venueHours} <br>
+                            <div class="source">
+                            Source: <a href="https://foursquare.com/" class="source"> https://foursquare.com </a>
+                            </div>
+                            </td>
+                            </tr>
+                            </table>
+                            </div>`;
+        } else {
+            infoStr = `<div id="content"> <p class="info"> Couldn't find information about this place. Sorry! </p>
+                       </div>`;
+        }
         self.miniInfoWindow.setContent(infoStr);
         self.miniInfoWindow.open(map, marker);
         self.miniInfoWindow.addListener('closeclick', self.miniInfoWindowClose);
