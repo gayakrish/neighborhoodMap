@@ -23,3 +23,6 @@ Download and extract the zip file from this repository. Open index.html from you
 
 ## Testing ##
 This game has been tested on Chrome, Microsoft Edge, Opera and Mozilla Firefox browsers. It has also been tested on different screen sizes using the Chrome Dev Tools device emulator, Samsung Galaxy S6 and Samsung Galaxy S7 Edge mobile phones.
+
+## Credits ##
+1. No photo icon image obtained from [freeiconspng](http://www.freeiconspng.com/)img/23494

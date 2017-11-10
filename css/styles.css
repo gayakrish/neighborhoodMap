@@ -143,7 +143,7 @@ tr {
 
     #content {
         width: 20em;
-        height: 10em;
+        /*height: 10em;*/
         text-overflow: none;
         justify-content: center;
         padding: 0;
@@ -201,7 +201,7 @@ tr {
         resize: both;
         overflow: auto;
         width: 16em;
-        height: 8em;
+        /*height: 8em;*/
     }
 }
 

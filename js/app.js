@@ -149,119 +149,65 @@ var ViewModel = function() {
         }, 700);
     };
 
-    self.isDetailedInfo = false;
-
     //this method sends an Ajax request to foursquare and gets the venues at the specified latlng
     self.detailedInfoWindow = function(marker) {
         self.menuVisible(false);
-        self.isDetailedInfo = false;
-        const venueIdRequest = new XMLHttpRequest();
-        venueIdRequest.onload = self.getVenueId;
-        venueIdRequest.onerror = self.ajaxError;
-
         var markerPos = marker.getPosition();
         var markerLat = markerPos.lat();
         var markerLng = markerPos.lng();
         var markerName = marker.title;
 
-        //get the details of venues at the marker latlng
-        venueIdRequest.open('GET',
-            `https://api.foursquare.com/v2/venues/search?ll=${markerLat},${markerLng}&name=${markerName}
-                            &client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
-                            &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU
-                            &v=20170101`);
-        venueIdRequest.send();
-
-        // fetch(`https://api.foursquare.com/v2/venues/search?ll=${markerLat},${markerLng}&name=${markerName}
-        //     &client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
-        //     &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU
-        //     &v=20170101`)
-        // .then(response => response.json())
-        // .then(self.getVenueId)
-        // .catch(e => self.ajaxError);
+        fetch(`https://api.foursquare.com/v2/venues/search?ll=${markerLat},${markerLng}&name=${markerName}
+                &intent=match&city='Fort Collins'
+                &client_id=2U1TKXY4EE4QIQTT02IEET2QXTTXYYFIZ3LRCJA35ERGUJGM
+                &client_secret=R2UDUI5BZR0K52Y2IQSNKVZEA3WLOUETFID3YRADQAB33NZ4
+                &v=20170101`)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                self.getVenueId(data);
+            })
+            .catch(function(error) {
+                self.ajaxError();
+            });
     };
 
 
     //from the venue data from Ajax response, we extract the exact or matching venue's venue id
     self.getVenueId = function(data) {
-        console.log('data ' + data);
-        var data = JSON.parse(this.response);
         var venues = data.response.venues;
-
-        for (var i = 0; i < venues.length; i++) {
-            var venueName = venues[i].name;
-            var markerTitle = self.currentMarker().title;
-
-            //check if the marker title matches with any venue name
-            if (self.checkVenueName(venueName, markerTitle)) {
-
-                self.isDetailedInfo = true;
-                //get the venue details using venueId
-                var venueId = venues[i].id;
-                const venueDetailsRequest = new XMLHttpRequest();
-                venueDetailsRequest.onload = self.venueDetails;
-                venueDetailsRequest.onerror = self.ajaxError;
-
-                venueDetailsRequest.open('GET', `https://api.foursquare.com/v2/venues/${venueId}?client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
-                                        &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU&v=20170101`);
-                venueDetailsRequest.send();
-
-                // fetch(`https://api.foursquare.com/v2/venues/${venueId}?client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
-                //     &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU&v=20170101`)
-                // .then(response => response.json())
-                // .then(self.venueDetails)
-                // .catch(e => self.ajaxError);
-            } else {
-
-                // //appropriate error message is displayed when there is no information about the venue in foursquare
-                // var infoStr = `<div id="content"> <p class="info"> Couldn't find information about this place. Sorry! </p>
-                //                         </div>`;
-                // self.miniInfoWindow.setContent(infoStr);
-                // self.miniInfoWindow.open(map, self.currentMarker());
-                // self.miniInfoWindow.addListener('closeclick', self.miniInfoWindowClose);
-            }
-        }
-    };
-
-    //close action for the mini infoWindow
-    self.miniInfoWindowClose = function() {
-        self.miniInfoWindow.marker = null;
-    };
-
-    //this is to check if the JSON response has data for the matching venue name
-    self.checkVenueName = function(venueName, markerTitle) {
-        var venueArr = venueName.split(" ");
-        var markerTitleArr = markerTitle.split(" ");
-        if (venueName.includes(markerTitle)) {
-            return true;
-        } else {
-            for (var i = 0; i < venueArr.length; i++) {
-                for (var j = 0; j < markerTitleArr.length; j++) {
-                    if (venueArr[i].includes(markerTitleArr[j])) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        var venueName = venues[0].name;
+        var markerTitle = self.currentMarker().title;
+        var venueId = venues[0].id;
+        fetch(`https://api.foursquare.com/v2/venues/${venueId}?client_id=2U1TKXY4EE4QIQTT02IEET2QXTTXYYFIZ3LRCJA35ERGUJGM
+                &client_secret=R2UDUI5BZR0K52Y2IQSNKVZEA3WLOUETFID3YRADQAB33NZ4&v=20170101`)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                self.venueDetails(data);
+            })
+            .catch(function(error) {
+                self.ajaxError();
+            });
     };
 
     //after obtaining the venue is, details about the specific venue are retrieved from JSON response and displayed in the infowindow
     self.venueDetails = function(data) {
         var marker = self.currentMarker();
-        var data = JSON.parse(this.response);
         var venueUrl = self.getVenueUrl(data);
         var venueHours = self.getVenueHours(data);
         var venueLoc = self.getVenueLoc(data);
         var venuePic = self.getVenuePic(data);
-        var infoStr = "";
-
-        if(self.isDetailedInfo) {
-            infoStr = `<div id="content">
+        if (venuePic === "") {
+            venuePic = `images/no-image-icon.png`;
+        }
+        var infoStr = `<div id="content">
                             <table class="info">
                             <tr> <th colspan="3"> <h4> ${marker.title} </h4> </th></tr>
                             <tr>
-                            <td rowspan="3" colspan="1"> <img src=${venuePic} height=50 width=50> </td>
+                            <td rowspan="3" colspan="1"> <img src='${venuePic}' height=50 width=50> </td>
                             <td colspan="2">${venueLoc} <br>
                             <a href=${venueUrl}> ${venueUrl} </a> <br>
                             ${venueHours} <br>
@@ -272,13 +218,14 @@ var ViewModel = function() {
                             </tr>
                             </table>
                             </div>`;
-        } else {
-            infoStr = `<div id="content"> <p class="info"> Couldn't find information about this place. Sorry! </p>
-                       </div>`;
-        }
         self.miniInfoWindow.setContent(infoStr);
         self.miniInfoWindow.open(map, marker);
         self.miniInfoWindow.addListener('closeclick', self.miniInfoWindowClose);
+    };
+
+    //close action for the mini infoWindow
+    self.miniInfoWindowClose = function() {
+        self.miniInfoWindow.marker = null;
     };
 
     //retrieve the venue's pic url from the JSON response
@@ -329,8 +276,14 @@ var ViewModel = function() {
         self.menuVisible(!self.menuVisible());
     };
 
+    //this is to handle and display the appropriate error message
     self.ajaxError = function(err) {
         console.log("Error getting venue details " + err);
+        var infoStr = `<div id="content"> <p class="info"> Couldn't find information about this place. Sorry! </p>
+                       </div>`;
+        self.miniInfoWindow.setContent(infoStr);
+        self.miniInfoWindow.open(self.map, self.currentMarker());
+        self.miniInfoWindow.addListener('closeclick', self.miniInfoWindowClose);
     };
 };
 
