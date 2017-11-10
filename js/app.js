@@ -41,26 +41,7 @@ var ViewModel = function() {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
             for (var i = 0; i < results.length; i++) {
                 var place = results[i];
-                var marker = new google.maps.Marker({
-                    map: self.map,
-                    position: place.geometry.location,
-                    title: place.name,
-                    animation: google.maps.Animation.DROP,
-                    optimized: false,
-                    zoomControl: true,
-                    scaleControl: true
-                });
-
-                marker.addListener('mousedown', function() {
-                    self.setCurrentMarker(this);
-                });
-                marker.addListener('mouseover', function() {
-                    self.openminiInfoWindow(this);
-                });
-                marker.addListener('mouseout', function() {
-                    self.closeminiInfoWindow(this);
-                });
-
+                var marker = self.createMarker(place.geometry.location, place.name);
                 self.markerArray.push(marker);
                 self.bounds.extend(marker.position);
             }
@@ -79,7 +60,7 @@ var ViewModel = function() {
     self.openminiInfoWindow = function(marker) {
         var infoStr = `<div class="info">${marker.title}</div>`;
         self.miniInfoWindow.setContent(infoStr);
-        self.miniInfoWindow.open(map, marker);
+        self.miniInfoWindow.open(self.map, marker);
         self.miniInfoWindow.addListener('closeclick', function() {
             self.miniInfoWindow.marker = null;
         });
@@ -88,6 +69,37 @@ var ViewModel = function() {
     //this is to exit the infowindow on mouseout event on the marker or the list item
     self.closeminiInfoWindow = function(marker) {
         self.miniInfoWindow.marker = null;
+    };
+
+    //creates a marker at the given location and name, registers event listeners
+    self.createMarker = function(location, name) {
+        var marker = new google.maps.Marker({
+            map: self.map,
+            position: location,
+            title: name,
+            animation: google.maps.Animation.DROP,
+            optimized: false,
+            zoomControl: true,
+            scaleControl: true
+        });
+
+        marker.addListener('click', function() {
+            self.setCurrentMarker(marker);
+        });
+
+        marker.addListener('mousedown', function() {
+            self.setCurrentMarker(marker);
+        });
+
+        marker.addListener('mouseover', function() {
+            self.openminiInfoWindow(marker);
+        });
+
+        marker.addListener('mouseout', function() {
+            self.closeminiInfoWindow(marker);
+        });
+
+        return marker;
     };
 
     //when a new search text is entered, this function retrieves relevant places and displays markers on each of them
@@ -103,17 +115,7 @@ var ViewModel = function() {
                 self.clearMarkers();
                 for (var i = 0; i < results.length; i++) {
                     var place = results[i];
-                    var marker = new google.maps.Marker({
-                        map: self.map,
-                        position: place.geometry.location,
-                        title: place.name,
-                        animation: google.maps.Animation.DROP,
-                        optimized: false
-                    });
-
-                    marker.addListener('click', self.setCurrentMarker);
-                    marker.addListener('mouseover', self.openminiInfoWindow);
-                    marker.addListener('mouseout', self.closeminiInfoWindow);
+                    var marker = self.createMarker(place.geometry.location, place.name);
 
                     //change the KO observable array to the new search list
                     tempMarker.push(marker);
@@ -196,11 +198,14 @@ var ViewModel = function() {
                                         </div>`;
                 self.miniInfoWindow.setContent(infoStr);
                 self.miniInfoWindow.open(map, self.currentMarker());
-                self.miniInfoWindow.addListener('closeclick', function() {
-                    self.miniInfoWindow.marker = null;
-                });
+                self.miniInfoWindow.addListener('closeclick', self.miniInfoWindowClose);
             }
         }
+    };
+
+    //close action for the mini infoWindow
+    self.miniInfoWindowClose = function() {
+        self.miniInfoWindow.marker = null;
     };
 
     //this is to check if the JSON response has data for the matching venue name
@@ -247,9 +252,7 @@ var ViewModel = function() {
                         </div>`;
         self.miniInfoWindow.setContent(infoStr);
         self.miniInfoWindow.open(map, marker);
-        self.miniInfoWindow.addListener('closeclick', function() {
-            self.miniInfoWindow.marker = null;
-        });
+        self.miniInfoWindow.addListener('closeclick', self.miniInfoWindowClose);
     };
 
     //retrieve the venue's pic url from the JSON response
