@@ -17,19 +17,24 @@
 
 <body>
   <div class="container-fluid">
+
     <div id="map-container">
       <div id="map">
       </div>
     </div>
+
     <div id="search">
       <input type="text" placeholder="Search" id="search-text" data-bind="value: searchText">
       <button type="button" class="hamburger-menu" data-bind="click: toggleMenu"><i class="fa fa-list" aria-hidden="true"></i> </button>
+
       <ul id="search-list" data-bind="foreach: markerArray, css: { open: menuVisible }">
         <li data-bind="text: $data.title, click: $parent.setCurrentMarker, event: {mouseover: $parent.openminiInfoWindow, mouseout: $parent.closeminiInfoWindow}" class="search-list-item"> </li>
       </ul>
     </div>
+
   </div>
 </body>
+
 <script src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyCKLAjXGyawg0qIORfV758s2ioXGdsJSe4"></script>
 <script src="js/app.js">
 </script>
