@@ -68,7 +68,7 @@ var ViewModel = function() {
         } else {
 
             //if there is no information regarding the search text, appropriate error message is displayed
-            if (self.searchText() != '') {
+            if (self.searchText() !== '') {
                 window.alert("We could not find that location - please try again with another search term");
                 self.searchText('');
             }
@@ -83,19 +83,20 @@ var ViewModel = function() {
         self.miniInfoWindow.addListener('closeclick', function() {
             self.miniInfoWindow.marker = null;
         });
-    }
+    };
 
     //this is to exit the infowindow on mouseout event on the marker or the list item
     self.closeminiInfoWindow = function(marker) {
         self.miniInfoWindow.marker = null;
-    }
+    };
 
     //when a new search text is entered, this function retrieves relevant places and displays markers on each of them
     self.updateMarker = ko.computed(function() {
         self.request = {
             bounds: self.bounds,
             keyword: self.searchText()
-        }
+        };
+
         self.service.nearbySearch(self.request, function(results, status) {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
                 var tempMarker = [];
@@ -110,15 +111,9 @@ var ViewModel = function() {
                         optimized: false
                     });
 
-                    marker.addListener('click', function() {
-                        self.setCurrentMarker(this);
-                    });
-                    marker.addListener('mouseover', function() {
-                        self.openminiInfoWindow(this);
-                    });
-                    marker.addListener('mouseout', function() {
-                        self.closeminiInfoWindow(this);
-                    });
+                    marker.addListener('click', self.setCurrentMarker);
+                    marker.addListener('mouseover', self.openminiInfoWindow);
+                    marker.addListener('mouseout', self.closeminiInfoWindow);
 
                     //change the KO observable array to the new search list
                     tempMarker.push(marker);
@@ -128,7 +123,7 @@ var ViewModel = function() {
                 self.map.fitBounds(self.bounds);
 
             } else {
-                if (self.searchText() != '') {
+                if (self.searchText() !== '') {
                     window.alert("We could not find that location - please try again with another search term");
                     self.searchText('');
                 }
@@ -150,16 +145,14 @@ var ViewModel = function() {
         setTimeout(function() {
             marker.setAnimation(null);
         }, 700);
-    }
+    };
 
     //this method sends an Ajax request to foursquare and gets the venues at the specified latlng
     self.detailedInfoWindow = function(marker) {
         self.menuVisible(false);
         const venueIdRequest = new XMLHttpRequest();
         venueIdRequest.onload = self.getVenueId;
-        venueIdRequest.onerror = function(err) {
-            console.log("Error getting venue details " + err);
-        }
+        venueIdRequest.onerror = self.ajaxError;
 
         var markerPos = marker.getPosition();
         var markerLat = markerPos.lat();
@@ -173,7 +166,7 @@ var ViewModel = function() {
                             &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU
                             &v=20170101`);
         venueIdRequest.send();
-    }
+    };
 
     //from the venue data from Ajax response, we extract the exact or matching venue's venue id
     self.getVenueId = function() {
@@ -191,9 +184,8 @@ var ViewModel = function() {
                 var venueId = venues[i].id;
                 const venueDetailsRequest = new XMLHttpRequest();
                 venueDetailsRequest.onload = self.venueDetails;
-                venueDetailsRequest.onerror = function(err) {
-                    console.log("Error getting venue details " + err);
-                }
+                venueDetailsRequest.onerror = self.ajaxError;
+
                 venueDetailsRequest.open('GET', `https://api.foursquare.com/v2/venues/${venueId}?client_id=EDQTERY1IPD34QQA4NGCV0OI3QGKMQQM5SCSFXX04YDRIRPE
                                         &client_secret=NCOEULIZXHH04MBAZTJDLUZIOF2D1YFKCCUP5OZEIX4CM1OU&v=20170101`);
                 venueDetailsRequest.send();
@@ -209,7 +201,7 @@ var ViewModel = function() {
                 });
             }
         }
-    }
+    };
 
     //this is to check if the JSON response has data for the matching venue name
     self.checkVenueName = function(venueName, markerTitle) {
@@ -227,7 +219,7 @@ var ViewModel = function() {
             }
         }
         return false;
-    }
+    };
 
     //after obtaining the venue is, details about the specific venue are retrieved from JSON response and displayed in the infowindow
     self.venueDetails = function() {
@@ -258,7 +250,7 @@ var ViewModel = function() {
         self.miniInfoWindow.addListener('closeclick', function() {
             self.miniInfoWindow.marker = null;
         });
-    }
+    };
 
     //retrieve the venue's pic url from the JSON response
     self.getVenuePic = function(data) {
@@ -267,7 +259,7 @@ var ViewModel = function() {
         } else {
             return "";
         }
-    }
+    };
 
     //retrieve the venue's website details from the JSON response
     self.getVenueUrl = function(data) {
@@ -276,7 +268,7 @@ var ViewModel = function() {
         } else {
             return data.response.venue.canonicalUrl;
         }
-    }
+    };
 
     //retrieve the venue's address from the JSON response
     self.getVenueLoc = function(data) {
@@ -285,7 +277,7 @@ var ViewModel = function() {
         } else {
             return "";
         }
-    }
+    };
 
     //retrieve the venue's open-close hours from the JSON response
     self.getVenueHours = function(data) {
@@ -294,19 +286,23 @@ var ViewModel = function() {
         } else {
             return "";
         }
-    }
+    };
 
     //this function clears the existing markers when a new search text is entered
     self.clearMarkers = function() {
         for (var i = 0; i < self.markerArray().length; i++) {
             self.markerArray()[i].setMap(null);
         }
-    }
+    };
 
     //this is to handle the visibility of the hamburger menu
     self.toggleMenu = function() {
         self.menuVisible(!self.menuVisible());
     };
-}
+
+    self.ajaxError = function(err) {
+        console.log("Error getting venue details " + err);
+    };
+};
 
 ko.applyBindings(new ViewModel());
