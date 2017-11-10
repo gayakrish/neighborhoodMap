@@ -17,9 +17,9 @@ Download and extract the zip file from this repository. Open index.html from you
 7. On the smaller screens i.e less than 750px or so, the search list is hidden and is displayed when the list icon is clicked.
 
 ## APIs and Frameworks ##
-1. Knockout is used for updating the DOM elements. It is included in the zip file.
-2. Google Map is used for rendering the map, search places and display markers.
-3. Foursquare API is used for obtaining detailed information about a location. Ajax request is used for connecting with Foursquare.
+1. [Knockout.js](http://knockoutjs.com/documentation/introduction.html) is used for updating the DOM elements. It is included in the zip file.
+2. [Google Map](https://developers.google.com/maps/documentation/javascript/) is used for rendering the map, search places and display markers.
+3. [Foursquare API](https://developer.foursquare.com/) is used for obtaining detailed information about a location. Ajax request is used for connecting with Foursquare.
 
 ## Testing ##
 This game has been tested on Chrome, Microsoft Edge, Opera and Mozilla Firefox browsers. It has also been tested on different screen sizes using the Chrome Dev Tools device emulator, Samsung Galaxy S6 and Samsung Galaxy S7 Edge mobile phones.
