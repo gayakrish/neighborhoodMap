@@ -110,11 +110,10 @@ th {
     background-color: orange;
     border-radius: 3px;
 }
-
 tr {
-	padding-top: 0;
-	padding-bottom: 0;
-	margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
 }
 
 @media screen and (max-width: 750px) {
@@ -144,6 +143,7 @@ tr {
     #content {
         width: 20em;
         /*height: 10em;*/
+
         text-overflow: none;
         justify-content: center;
         padding: 0;
@@ -151,13 +151,13 @@ tr {
         font: 12px "Comic Sans MS", cursive, sans-serif;
         z-index: 20;
         display: -webkit-flex;
-	    /* Safari */
+        /* Safari */
 
-	    -webkit-justify-content: space-around;
-	    /* Safari 6.1+ */
+        -webkit-justify-content: space-around;
+        /* Safari 6.1+ */
 
-	    display: inline-block;
-	    justify-content: center;
+        display: inline-block;
+        justify-content: center;
     }
 
     #map {
@@ -206,10 +206,9 @@ tr {
 }
 
 @media screen and (min-width: 750px) and (max-width: 1100px) {
-	#search-text {
+    #search-text {
         width: 11em;
     }
-
     #search-list {
         width: 10em;
     }
