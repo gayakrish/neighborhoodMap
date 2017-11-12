@@ -4,7 +4,7 @@
 
 a,
 p {
-    font: 12px "Comic Sans MS", cursive, sans-serif;
+    font: 12px "Oxygen", sans-serif;
 }
 
 h4 {
@@ -33,7 +33,7 @@ h4 {
     border-style: none;
     line-height: 3em;
     border-radius: 5px;
-    font: 16px "Comic Sans MS", cursive, sans-serif;
+    font: 16px "Oxygen", sans-serif;
     height: 2em;
     box-shadow: 2px 2px 2px 2px #ada9a8;
 }
@@ -48,12 +48,13 @@ h4 {
     width: 17em;
     word-wrap: break-word;
     opacity: 1;
-    font: 16px "Comic Sans MS", cursive, sans-serif;
+    font: 16px "Oxygen", sans-serif;
     color: black;
-    height: 25em;
     overflow: auto;
     border-radius: 5px;
     box-shadow: 2px 2px 2px 2px #ada9a8;
+    min-height: 20px;
+	overflow: hidden;
 }
 
 li {
@@ -82,7 +83,7 @@ li {
     padding: 0;
     margin: 0;
     z-index: 99;
-    font: 14px "Comic Sans MS", cursive, sans-serif;
+    font: 14px "Oxygen", sans-serif;
     display: -webkit-flex;
     /* Safari */
 
@@ -97,12 +98,12 @@ li {
     padding: 0;
     padding-top: 4px;
     margin: 0;
-    font: 16px "Comic Sans MS", cursive, sans-serif;
+    font: 16px "Oxygen", sans-serif;
     overflow: auto;
 }
 
 .source {
-    font: 9px "Comic Sans MS", cursive, sans-serif;
+    font: 9px "Oxygen", sans-serif;
     font-style: italic;
 }
 
@@ -137,7 +138,8 @@ tr {
         transform: translate(-300px, 0);
         transition: transform 0.3s ease;
         display: none;
-        height: 10em;
+        min-height: 20px;
+		overflow-y: auto;
     }
 
     #content {
@@ -148,7 +150,7 @@ tr {
         justify-content: center;
         padding: 0;
         margin: 0;
-        font: 12px "Comic Sans MS", cursive, sans-serif;
+        font: 12px "Oxygen", sans-serif;
         z-index: 20;
         display: -webkit-flex;
         /* Safari */
@@ -194,7 +196,7 @@ tr {
     .info {
         padding: 0;
         margin: 0;
-        font: 12px "Comic Sans MS", cursive, sans-serif;
+        font: 12px "Oxygen", sans-serif;
     }
 
     #content {

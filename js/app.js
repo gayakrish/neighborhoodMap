@@ -2,6 +2,7 @@ var ViewModel = function() {
     var self = this;
     self.markerArray = ko.observableArray([]);
     self.searchText = ko.observable('');
+    self.searchList = [];
 
     //location of Fort Collins, CO
     self.location = {
@@ -19,7 +20,7 @@ var ViewModel = function() {
     self.request = {
         location: self.location,
         radius: '2000',
-        types: ['park']
+        types: ['restaurant']
     };
     self.service = new google.maps.places.PlacesService(self.map);
     self.currentMarker = ko.observable('');
@@ -36,6 +37,9 @@ var ViewModel = function() {
         self.map.setCenter(center);
     });
 
+    //setting this flag helps in resetting the markers when no text is entered in the search box
+    self.isStart = true;
+
     //this is to get the requested places and place markers after the map is loaded
     self.service.nearbySearch(self.request, function(results, status) {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -43,6 +47,7 @@ var ViewModel = function() {
                 var place = results[i];
                 var marker = self.createMarker(place.geometry.location, place.name);
                 self.markerArray.push(marker);
+                self.searchList.push(marker);
                 self.bounds.extend(marker.position);
             }
             self.map.fitBounds(self.bounds);
@@ -55,6 +60,14 @@ var ViewModel = function() {
             }
         }
     });
+
+    //resets the markers when the search box is clicked and no search text
+    self.resetMarker = function() {
+        self.markerArray(self.searchList);
+        for (var i = 0; i < self.markerArray().length; i++) {
+            self.markerArray()[i].setMap(self.map);
+        }
+    };
 
     //this function is to open the info window with just the title when there is a mouseover event on the marker or list item
     self.openminiInfoWindow = function(marker) {
@@ -104,33 +117,32 @@ var ViewModel = function() {
 
     //when a new search text is entered, this function retrieves relevant places and displays markers on each of them
     self.updateMarker = ko.computed(function() {
-        self.request = {
-            bounds: self.bounds,
-            keyword: self.searchText()
-        };
+        if (self.searchText() !== '') {
+            self.isStart = false;
+            self.clearMarkers();
 
-        self.service.nearbySearch(self.request, function(results, status) {
-            if (status == google.maps.places.PlacesServiceStatus.OK) {
-                var tempMarker = [];
-                self.clearMarkers();
-                for (var i = 0; i < results.length; i++) {
-                    var place = results[i];
-                    var marker = self.createMarker(place.geometry.location, place.name);
-
-                    //change the KO observable array to the new search list
-                    tempMarker.push(marker);
-                    self.bounds.extend(marker.position);
-                }
-                self.markerArray(tempMarker);
-                self.map.fitBounds(self.bounds);
-
-            } else {
-                if (self.searchText() !== '') {
-                    window.alert("We could not find that location - please try again with another search term");
-                    self.searchText('');
+            for (var i = 0; i < self.searchList.length; i++) {
+                var place = self.searchList[i];
+                if (place.title.toLowerCase().indexOf(self.searchText().toLowerCase()) >= 0) {
+                    var marker = self.searchList[i];
+                    marker.setMap(self.map);
+                    self.markerArray.push(marker);
+                    // self.bounds.extend(marker.position);
                 }
             }
-        });
+
+            if (self.markerArray().length > 0) {
+                self.map.fitBounds(self.bounds);
+            } else {
+                window.alert("We could not find that location - please try again with another search term");
+                self.searchText('');
+                self.resetMarker();
+            }
+        } else {
+            if (!self.isStart) {
+                self.resetMarker();
+            }
+        }
     });
 
     //this function is called when a marker is clicked, this opens a detailed info window with data from foursquare api
@@ -138,7 +150,6 @@ var ViewModel = function() {
         self.currentMarker(marker);
         self.toggleMarker(self.currentMarker());
         self.detailedInfoWindow(marker);
-
     };
 
     //this is to animate the clicked or selected marker
@@ -269,6 +280,7 @@ var ViewModel = function() {
         for (var i = 0; i < self.markerArray().length; i++) {
             self.markerArray()[i].setMap(null);
         }
+        self.markerArray([]);
     };
 
     //this is to handle the visibility of the hamburger menu
@@ -287,4 +299,10 @@ var ViewModel = function() {
     };
 };
 
-ko.applyBindings(new ViewModel());
+function initApp() {
+    ko.applyBindings(new ViewModel());
+}
+
+function mapError() {
+    window.alert("Unable to load the Google Map. Please try again later");
+}
